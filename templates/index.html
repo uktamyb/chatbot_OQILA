@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- changes test in 23.12.2024 -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatGPT Chatbot</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <button id="toggle-mode" onclick="toggleMode()">
+      <span id="toggle-icon" class="fa-solid fa-moon fa-xl"></span>
+    </button>
+    <div class="container">
+      <!-- Butun page -->
+      <h1 id="header">Sizga Qanday Yordam Beraolaman?</h1>
+      <div id="messages">
+        <!-- message box -->
+        <div class="placeholder" id="placeholder">
+          <!-- placeholder -->
+          <div class="icons">
+            <span
+              data-text="Fayl yuklang"
+              class="icon tooltip upload-icon"
+              onclick="document.getElementById('file-input').click()"
+              ><i class="fa-solid fa-paperclip"></i
+            ></span>
+            <span
+              data-text="Web qidiring"
+              class="icon tooltip web-search-icon"
+              onclick="webSearch()"
+              ><i class="fa-solid fa-globe"></i
+            ></span>
+          </div>
+          <input
+            type="file"
+            id="file-input"
+            style="display: none"
+            onchange="uploadFile(event)"
+            multiple
+          />
+          <textarea
+            id="user-input"
+            placeholder="OQILA-1 dan so'rang"
+            onkeydown="checkEnter(event)"
+            onfocus="movePlaceholderDown()"
+          ></textarea>
+          <span class="icon send-icon" onclick="sendMessage()"
+            ><i class="fa-solid fa-paper-plane"></i
+          ></span>
+        </div>
+      </div>
+    </div>
+
+    <img
+      src="{{ url_for('static', filename='images/boy_png.png') }}"
+      alt="Corner Image"
+      class="corner-image"
+    />
+
+    <script>
+      // dark mode
+      function toggleMode() {
+        document.body.classList.toggle("dark-mode");
+        const toggleIcon = document.getElementById("toggle-icon");
+        if (document.body.classList.contains("dark-mode")) {
+          toggleIcon.classList.remove("fa-moon");
+          toggleIcon.classList.add("fa-sun");
+          toggleIcon.style.color = "#FFD700";
+        } else {
+          toggleIcon.classList.remove("fa-sun");
+          toggleIcon.classList.add("fa-moon");
+          toggleIcon.style.color = "#4B0082";
+        }
+      }
+
+      function checkEnter(event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      }
+
+      function movePlaceholderDown() {
+        const placeholder = document.getElementById("placeholder");
+        placeholder.style.position = "absolute";
+        placeholder.style.bottom = "10px";
+        placeholder.style.top = "auto";
+        placeholder.style.transform = "translateX(-50%)";
+      }
+
+      async function sendMessage() {
+        const userInput = document.getElementById("user-input").value;
+        const messages = document.getElementById("messages");
+        messages.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+        document.getElementById("user-input").value = "";
+
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userInput })
+          });
+          const data = await response.json();
+          messages.innerHTML += `<p><strong>CheksizILM:</strong> ${data.response}</p>`;
+          messages.scrollTop = messages.scrollHeight;
+          header.style.display = "none"; // yangi qushildi
+        } catch (error) {
+          messages.innerHTML += `<p><strong>Error:</strong> ${error.message}</p>`;
+        }
+      }
+
+      async function webSearch() {
+        const userInput = document.getElementById("user-input").value;
+        const messages = document.getElementById("messages");
+        const header = document.getElementById("header");
+        messages.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+        document.getElementById("user-input").value = "";
+
+        try {
+          const response = await fetch("/websearch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: userInput })
+          });
+          const data = await response.json();
+          messages.innerHTML += `<p><strong>Web Search:</strong> ${data.results}</p>`;
+          messages.scrollTop = messages.scrollHeight;
+          header.style.display = "none"; // Hide the header after sending the message
+        } catch (error) {
+          messages.innerHTML += `<p><strong>Error:</strong> ${error.message}</p>`;
+        }
+      }
+    </script>
+  </body>
+</html>
