@@ -72,11 +72,28 @@
     />
 
     <script>
-      // dark mode
+      // Sahifa yuklanganda dark mode holatini tekshirish
+      window.addEventListener("DOMContentLoaded", () => {
+        const darkMode = localStorage.getItem("darkMode");
+
+        if (darkMode === "true") {
+          document.body.classList.add("dark-mode");
+          const toggleIcon = document.getElementById("toggle-icon");
+          toggleIcon.classList.remove("fa-moon");
+          toggleIcon.classList.add("fa-sun");
+          toggleIcon.style.color = "#FFD700";
+        }
+      });
+
+      // dark mode toggle
       function toggleMode() {
         document.body.classList.toggle("dark-mode");
+
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", isDark); // saqlash
+
         const toggleIcon = document.getElementById("toggle-icon");
-        if (document.body.classList.contains("dark-mode")) {
+        if (isDark) {
           toggleIcon.classList.remove("fa-moon");
           toggleIcon.classList.add("fa-sun");
           toggleIcon.style.color = "#FFD700";
@@ -114,7 +131,7 @@
             body: JSON.stringify({ message: userInput })
           });
           const data = await response.json();
-          messages.innerHTML += `<p><strong>CheksizILM:</strong> ${data.response}</p>`;
+          messages.innerHTML += `<p><strong>OqilaAI:</strong> ${data.response}</p>`;
           messages.scrollTop = messages.scrollHeight;
           header.style.display = "none"; // yangi qushildi
         } catch (error) {
