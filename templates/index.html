@@ -114,7 +114,7 @@
             body: JSON.stringify({ message: userInput })
           });
           const data = await response.json();
-          messages.innerHTML += `<p><strong>OqilaAI:</strong> ${data.response}</p>`;
+          messages.innerHTML += `<p><strong>CheksizILM:</strong> ${data.response}</p>`;
           messages.scrollTop = messages.scrollHeight;
           header.style.display = "none"; // yangi qushildi
         } catch (error) {
